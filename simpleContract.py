@@ -2,7 +2,7 @@ import smartpy as sp
 
 class Election(sp.Contract):
     def __init__(self, candidate1, candidate2,start_time,end_time):
-        self.init(candidates = sp.utils.vector([candidate1, candidate2]), votes = sp.utils.vector([0, 0]), voting_open = False, start_time = start_time, end_time = end_time)
+        self.init(candidates = sp.utils.vector([candidate1, candidate2]), votes = sp.utils.vector([0, 0]), voting_open = False, start_time = start_time, end_time = end_time, winner = sp.nat(0))
 
     @sp.entry_point
     def vote(self, params):
@@ -13,6 +13,19 @@ class Election(sp.Contract):
     @sp.entry_point
     def get_result(self, params):
         sp.verify(self.data.votes[params.candidate] >= 0)
+
+    # @sp.entry_point
+    # def get_winner(self):
+    #     winner_index = -1
+    #     max_vote = -1
+    #     with sp.for_('i', sp.range(0,sp.len(self.data.votes))) as i:
+    #         sp.if self.data.votes[i] > max_vote:
+    #             max_vote = self.data.votes[i]
+    #             winner_index = i
+    #     sp.verify(winner_index >= 0, "No winner found")
+    #     winner = self.data.candidates[winner_index]
+
+    # This is repoting an error that i is escaping it's scope
 
     @sp.add_test(name = "main")
     def test():
@@ -33,5 +46,5 @@ class Election(sp.Contract):
         scenario += election.get_result(candidate=0)
         scenario.verify(election.data.votes[0] == 1)
 
-        Test Case for invalid input
+        # Test Case for invalid input
         scenario += election.vote(candidate=-1).run()
