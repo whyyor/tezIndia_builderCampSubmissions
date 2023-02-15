@@ -14,18 +14,16 @@ class Election(sp.Contract):
     def get_result(self, params):
         sp.verify(self.data.votes[params.candidate] >= 0)
 
-    # @sp.entry_point
-    # def get_winner(self):
-    #     winner_index = -1
-    #     max_vote = -1
-    #     with sp.for_('i', sp.range(0,sp.len(self.data.votes))) as i:
-    #         sp.if self.data.votes[i] > max_vote:
-    #             max_vote = self.data.votes[i]
-    #             winner_index = i
-    #     sp.verify(winner_index >= 0, "No winner found")
-    #     winner = self.data.candidates[winner_index]
-
-    # This is repoting an error that i is escaping it's scope
+    @sp.entry_point
+    def get_winner(self):
+        winner_index = sp.local('winner_index', -1)
+        max_vote = -1
+        with sp.for_('i', sp.range(0, sp.len(self.data.votes))) as i:
+            sp.if self.data.votes[i] > max_vote:
+                max_vote = self.data.votes[i]
+                winner_index.value = sp.to_int(i)
+        sp.verify(winner_index.value >= 0, "No winner found")
+        winner = self.data.candidates[winner_index.value]
 
     @sp.add_test(name = "main")
     def test():
